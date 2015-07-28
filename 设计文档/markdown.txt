@@ -1,0 +1,41 @@
+## IM客户端SDK设计文档
+@(第一事业部)[软件科,刘鸿达,2015/07/28]
+###1.客户端SDK主要负责和服务端保持长连接，监听服务端的推送数据，发送客户端数据
+####1.1结构图
+![SDK层次](https://raw.githubusercontent.com/liuhongda/IM/master/img/struct.png)
+- ConnectionManager：维护客户端和IM服务器之间的长连接，周期心跳包，监听连接状态，重连机制
+- DeviceManager：验证客户端是否已经注册，没注册就进行注册，负责客户端登入和登出
+- ChatManager：消息发送，消息接收回调
+- Message：消息封装（消息类型：文本，语音，视频，命令，图片，位置；消息状态：成功，失败，发送中；消息传输方向：发出，接收）
+- MessageBody：消息体，封装了6中消息类型
+- Request：客户端发出的请求数据
+- Response：客户端接收到的反馈数据
+####1.2流程图
+![流程图](https://raw.githubusercontent.com/liuhongda/IM/master/img/flow.png)
+客户端SDK将持续和IM服务器之间维持一条长连接并负责接收和发送数据
+####1.3类图
+- ConnectionManager：
+![类图](https://raw.githubusercontent.com/liuhongda/IM/master/img/connectmgr.png)
+1. OnDataListener是发送数据和接收数据的监听回调
+2. connect负责连接到IM服务器，reconnect重连，send负责发送数据，getInstance获取该类单例
+3. ConnecttionManager类的具体方法参数会在编码中逐渐完善
+- ChatManager：
+![类图](https://raw.githubusercontent.com/liuhongda/IM/master/img/chatmgr.png)
+1. ChatManager负责发送消息和监听消息到的数据
+2. OnSendMessageListener和OnReceiveMessageListener分别为消息发送和接收的监听回调
+3. sendMessage是发送消息的实现方法 
+- DeviceManager：
+![类图](https://raw.githubusercontent.com/liuhongda/IM/master/img/devicemgr.png)
+1. DeviceManager负责验证用户注册，登入，登出
+2. OnConnectListener是客户端和IM服务器之间的连接状态的监听回调，这个应该是在ConnectionManager中的，这里放错地方了，后面再改过来
+- MessageBody：
+![类图](https://raw.githubusercontent.com/liuhongda/IM/master/img/msgbody.png)
+1. MessageBody是一个抽象类，他是所有类型消息体的父类
+2. FileMessageBody是文件类型的消息体，根据文件的类型还可分为VedioMessageBody（视频），ImageMessageBody（图片），VoiceMessageBody（音频）
+3. LocationMessageBody是位置类型的消息体
+4. TextMessageBody是文本类型的消息体
+5. CmdMessageBody是命令类型的消息体
+- request：
+![类图](https://raw.githubusercontent.com/liuhongda/IM/master/img/request.png)
+- response：
+![类图](https://raw.githubusercontent.com/liuhongda/IM/master/img/response.png)
